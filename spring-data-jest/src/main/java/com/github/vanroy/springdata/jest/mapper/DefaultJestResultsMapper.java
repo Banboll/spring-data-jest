@@ -1,5 +1,14 @@
 package com.github.vanroy.springdata.jest.mapper;
 
+import static org.apache.commons.lang.StringUtils.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -12,7 +21,7 @@ import com.google.gson.JsonObject;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.DocumentResult;
 import io.searchbox.core.SearchResult;
-import org.elasticsearch.search.SearchHitField;
+import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,15 +32,6 @@ import org.springframework.data.elasticsearch.core.mapping.ElasticsearchPersiste
 import org.springframework.data.elasticsearch.core.mapping.ElasticsearchPersistentProperty;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.util.StringUtils;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
-import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Jest implementation of Spring Data Elasticsearch results mapper.
@@ -134,7 +134,7 @@ public class DefaultJestResultsMapper implements JestResultsMapper {
 		return result;
 	}
 
-	private <T> T mapEntity(Collection<SearchHitField> values, Class<T> clazz) {
+	private <T> T mapEntity(Collection<DocumentField> values, Class<T> clazz) {
 		return mapEntity(buildJSONFromFields(values), clazz);
 	}
 
@@ -149,13 +149,13 @@ public class DefaultJestResultsMapper implements JestResultsMapper {
 		}
 	}
 
-	private String buildJSONFromFields(Collection<SearchHitField> values) {
+	private String buildJSONFromFields(Collection<DocumentField> values) {
 		JsonFactory nodeFactory = new JsonFactory();
 		try {
 			ByteArrayOutputStream stream = new ByteArrayOutputStream();
 			JsonGenerator generator = nodeFactory.createGenerator(stream, JsonEncoding.UTF8);
 			generator.writeStartObject();
-			for (SearchHitField value : values) {
+			for (DocumentField value : values) {
 				if (value.getValues().size() > 1) {
 					generator.writeArrayFieldStart(value.getName());
 					for (Object val : value.getValues()) {

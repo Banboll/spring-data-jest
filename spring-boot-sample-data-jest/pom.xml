@@ -16,6 +16,7 @@
 
     <properties>
         <main.basedir>${basedir}/../..</main.basedir>
+        <elasticsearch.version>6.2.2</elasticsearch.version>
     </properties>
 
     <dependencies>
